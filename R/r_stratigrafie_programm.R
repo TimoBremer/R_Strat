@@ -1,6 +1,6 @@
 RStratigraphy <- function(liste_stratigrafie, liste_absolute_datierungen, fehler_loeschen)
 {
-
+Änderung
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 # --- --- --- --- --- Formatierung der Daten fuer Weiterverarbeitung --- --- --- ----
