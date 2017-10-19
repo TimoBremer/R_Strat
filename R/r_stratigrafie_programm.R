@@ -1,3 +1,5 @@
+# ich habe die Globalvariablen herausgenommen und konnte bislang keinen Bug feststellen – im Auge behalten!
+
 RStratigraphy <- function(liste_stratigrafie, liste_absolute_datierungen, fehler_loeschen)
 {
 
@@ -22,7 +24,7 @@ liste_ueber_temp <- ergaenzen_listen(liste_ueber_temp, liste_unter_temp)
 # in Gleich-Liste werden umgekehrte Ausdruecke eingetragen (3 = 5 und 5 = 3):
 liste_gleich_temp <- ergaenzen_listen(liste_gleich_temp)
 
-# Spalte mit über/unter bzw. gleich löschen:
+# Spalte mit ueber/unter bzw. gleich loeschen:
 liste_ueber <- liste_ueber_temp[,c(1,3)]
 liste_gleich <- liste_gleich_temp[,c(1,3)]
 
@@ -33,7 +35,7 @@ liste_stellen <- c(array(liste_stratigrafie[,1]),array(liste_stratigrafie[,3]))
 # Sortieren der Stellen:
 liste_stellen <- liste_stellen[order(liste_stellen)]
 
-# Löschen doppelt genannte Stellen.
+# Loeschen doppelt genannte Stellen.
 liste_stellen <- unique(liste_stellen)
 
 
@@ -45,7 +47,7 @@ liste_stellen <- unique(liste_stellen)
 # --- --- --- --- --- --- --- --- --- --- --- ---
 
 # Erstellen der leeren Grundmatrix
-# Erstellen einer Matrix befüllt mit Nullen, die so viel Zeilen und Spalten hat, wie Stellen (liste_stellen) vorhanden sind:
+# Erstellen einer Matrix befuellt mit Nullen, die so viel Zeilen und Spalten hat, wie Stellen (liste_stellen) vorhanden sind:
 leere_matrix <- as.data.frame(matrix(data=0, nrow = length(liste_stellen), ncol = length(liste_stellen)))
 
 # Stellenliste muss nun in Vektor umformatiert werden:
@@ -57,20 +59,20 @@ dimnames(leere_matrix) <- list(liste_stellen, liste_stellen)
 
 # --- --- --- Befuellen der Matritzen --- --- ---
 
-# 1. Matrix mit gleich-Werten befüllen:
-matrix_gleich <<-befuellen_matrix(leere_matrix, liste_gleich)
+# 1. Matrix mit gleich-Werten befuellen:
+matrix_gleich <-befuellen_matrix(leere_matrix, liste_gleich)
 
-# 2. Matrix mit über- und unter-Werten befüllen:
-matrix_ueber_unter <<-befuellen_matrix(leere_matrix, liste_ueber)
+# 2. Matrix mit ueber- und unter-Werten befuellen:
+matrix_ueber_unter <-befuellen_matrix(leere_matrix, liste_ueber)
 
-# Iteration über alle Felder (zunächst alle Spalten einer Zeile, dann nächste Zeile):
-# Widerspruchsanalyse an Ursprungsdaten ist erforderlich, um kurzkettige Fehler aufzuspüren
-print(paste("Wiederspruchsanalyse l?uft..."))
+# Iteration ueber alle Felder (zunaechst alle Spalten einer Zeile, dann naechste Zeile):
+# Widerspruchsanalyse an Ursprungsdaten ist erforderlich, um kurzkettige Fehler aufzuspueren
+print(paste("Wiederspruchsanalyse laeuft..."))
 for(zeilennr in 1:nrow(matrix_ueber_unter)) # Iteration Zeilen
 {
   for(spaltennr in 1:ncol(matrix_ueber_unter)) # Iteration spalten
   {
-    if (matrix_ueber_unter[zeilennr,spaltennr] == 1) # gucken ob Feld besetzt ist in Matrix über/unter
+    if (matrix_ueber_unter[zeilennr,spaltennr] == 1) # gucken ob Feld besetzt ist in Matrix ueber/unter
     {
       widerspruchsanalyse(zeilennr, spaltennr, TRUE, fehler_loeschen)
     }
@@ -81,26 +83,26 @@ for(zeilennr in 1:nrow(matrix_ueber_unter)) # Iteration Zeilen
 
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-# --- --- --- --- --- Vervollständigen der Matritzen --- --- --- --- --- ----
+# --- --- --- --- --- Vervollstaendigen der Matritzen --- --- --- --- --- ----
 
 # --- --- --- --- --- --- --- --- --- --- --- ---
-durchlaeufe <-1 # für die Anzeige, damit man sieht, dass das Programm läuft
+durchlaeufe <-1 # fuer die Anzeige, damit man sieht, dass das Programm laeuft
 repeat
 {
   summe_matrix_ueber_unter <- sum(rowSums(matrix_ueber_unter))
   summe_matrix_gleich <- sum(colSums(matrix_gleich))
 
-  # Iteration über alle Felder (zunächst alle Spalten einer Zeile, dann nächste Zeile):
+  # Iteration ueber alle Felder (zunaechst alle Spalten einer Zeile, dann naechste Zeile):
   for(zeilennr in 1:nrow(matrix_ueber_unter)) # Iteration Zeilen
   {
     for(spaltennr in 1:ncol(matrix_ueber_unter)) # Iteration spalten
     {
       if (matrix_gleich[zeilennr,spaltennr] == 1) # gucken ob Feld besetzt ist in Matrix gleich
       {
-        matrix_gleich <- gleichsetzen_spalten(matrix_gleich, zeilennr, spaltennr) # Ergänzen Matrix gleich
-        # falls die Diagonale besetzt wird (3=3) wird sie hiermit freigeräumt, ist nicht notwendig aber effizienter:
+        matrix_gleich <- gleichsetzen_spalten(matrix_gleich, zeilennr, spaltennr) # Ergaenzen Matrix gleich
+        # falls die Diagonale besetzt wird (3=3) wird sie hiermit freigeraeumt, ist nicht notwendig aber effizienter:
         matrix_gleich[zeilennr, zeilennr] <- 0
-        # wenn Feld gleich werden Zeilen in Matrix über/unter gleichgesetzt:
+        # wenn Feld gleich werden Zeilen in Matrix ueber/unter gleichgesetzt:
         matrix_ueber_unter <- gleichsetzen_spalten(matrix_ueber_unter, zeilennr, spaltennr)
         # und auch die Spalten werden gleichgesetzt, daher Transponierung
         matrix_ueber_unter <- t(matrix_ueber_unter)
@@ -108,11 +110,11 @@ repeat
         matrix_ueber_unter <- t(matrix_ueber_unter) # Matrix wird wieder in Augangslage gekippt
       }
 
-      if (matrix_ueber_unter[zeilennr,spaltennr] == 1) # gucken ob Feld besetzt ist in Matrix über/unter
+      if (matrix_ueber_unter[zeilennr,spaltennr] == 1) # gucken ob Feld besetzt ist in Matrix ueber/unter
       {
         # Abgleich der Daten innerhalb der "matrix_ueber_unter"
-        matrix_ueber_unter <- gleichsetzen_spalten(matrix_ueber_unter, zeilennr, spaltennr) # Gleichsetzen Spalten in der über/unter Matrix
-        # dürfte Fehler erst nach dem Gleichsetzen der Spalten erkennen, daher vielleicht eine Zeile höher? bei Zeiten ausprobieren!
+        matrix_ueber_unter <- gleichsetzen_spalten(matrix_ueber_unter, zeilennr, spaltennr) # Gleichsetzen Spalten in der ueber/unter Matrix
+        # duerfte Fehler erst nach dem Gleichsetzen der Spalten erkennen, daher vielleicht eine Zeile hoeher? bei Zeiten ausprobieren!
         widerspruchsanalyse(zeilennr, spaltennr, FALSE, fehler_loeschen)
       }
     }
@@ -127,7 +129,7 @@ repeat
 
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-# --- --- --- --- --- Ergänzen absoluter Datierungen --- --- --- --- --- --- ----
+# --- --- --- --- --- Ergaenzen absoluter Datierungen --- --- --- --- --- --- ----
 
 # --- --- --- --- --- --- --- --- --- --- --- ---
 
@@ -143,9 +145,9 @@ final_tab <- absolute_datierungen(liste_absolute_datierungen, liste_stellen, mat
 
 print(matrix_ueber_unter)
 print(matrix_gleich)
-#write.csv(matrix_ueber_unter, "/home/timo/Dropbox/Arbeitsfläche/stratigrafie_ueber_unter.csv")
-#write.csv(matrix_gleich, "/home/timo/Dropbox/Arbeitsfläche/stratigrafie_gleich.csv")
-#print(paste("Erfolg!!!, Anzahl Spalten Matrix-über-unter-etc.: ", sum(rowSums(matrix_ueber_unter)), "Matrix-gleich: ", sum(colSums(matrix_gleich))))
+#write.csv(matrix_ueber_unter, "/home/timo/Dropbox/Arbeitsflaeche/stratigrafie_ueber_unter.csv")
+#write.csv(matrix_gleich, "/home/timo/Dropbox/Arbeitsflaeche/stratigrafie_gleich.csv")
+#print(paste("Erfolg!!!, Anzahl Spalten Matrix-ueber-unter-etc.: ", sum(rowSums(matrix_ueber_unter)), "Matrix-gleich: ", sum(colSums(matrix_gleich))))
 print(final_tab)
 }
 

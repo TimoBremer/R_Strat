@@ -2,7 +2,7 @@
 
 # --- --- --- --- --- --- --- --- --- --- --- ---
 
-# Uebersetzt 1. die Unter-Liste in eine ueber-Liste und führt diese mit der bestehenden ueberliste-zusammen
+# Uebersetzt 1. die Unter-Liste in eine ueber-Liste und fuehrt diese mit der bestehenden ueberliste-zusammen
 # 2. wird die Gleich-Liste um umgekehrte Ausdruecke ergaenzt (3 = 5 und 5 = 3)
 ergaenzen_listen <- function(liste_zu_ergaenzen, liste_zu_veraendern = liste_zu_ergaenzen)
 
@@ -22,7 +22,7 @@ ergaenzen_listen <- function(liste_zu_ergaenzen, liste_zu_veraendern = liste_zu_
 
   # da die Liste unter gedreht wurde, kann nun "unter" durch "ueber" ersetzt werden:
   # ...das bugt, wenn die Tabelle keine Zeilen hat (passiert i.d.R. bei "gleich").
-  #...daher ist Schleife zu Prüfung erforderlich
+  #...daher ist Schleife zu Pruefung erforderlich
   if (nrow(liste_zu_ergaenzen) > 0)
   {
     liste_zu_ergaenzen[liste_zu_ergaenzen == "unter"] = "ueber"
@@ -37,19 +37,19 @@ ergaenzen_listen <- function(liste_zu_ergaenzen, liste_zu_veraendern = liste_zu_
 
 # --- --- --- --- --- --- --- --- --- --- --- ---
 
-## Funktion zum Befuellen Matrix, Variablen sind die Grundmatrix und eine der Listen "über..." oder "unter..."
+## Funktion zum Befuellen Matrix, Variablen sind die Grundmatrix und eine der Listen "ueber..." oder "unter..."
 befuellen_matrix <- function(ausgangsmatrix, liste_ueber_etc)
 
 {
-  ## muss vorab geprüft werden, ob list_ueber_etc überhaupt Daten enth?lt
+  ## muss vorab geprueft werden, ob list_ueber_etc ueberhaupt Daten enth?lt
   if (nrow(liste_ueber_etc) > 0)
   {
     ## Beginn for-Loop
     for(fortl_nr in 1:nrow(liste_ueber_etc))
     {
-      ## befüllt die Matrix mit den Werten aus liste_ueber etc., die Spaltenweise abgearbeitet werden
+      ## befuellt die Matrix mit den Werten aus liste_ueber etc., die Spaltenweise abgearbeitet werden
       ausgangsmatrix[(array(liste_ueber_etc[fortl_nr,1])),(array(liste_ueber_etc[fortl_nr,2]))] <- 1
-      #print(paste("fortlaufende Nr.: " , fortl_nr , "; ", liste_ueber_etc[,1], "über ", liste_ueber_etc[,3] , "Ende"))
+      #print(paste("fortlaufende Nr.: " , fortl_nr , "; ", liste_ueber_etc[,1], "ueber ", liste_ueber_etc[,3] , "Ende"))
     } ## Ende for-Loop
   }
   return(ausgangsmatrix)
@@ -63,7 +63,7 @@ befuellen_matrix <- function(ausgangsmatrix, liste_ueber_etc)
 
 # --- --- --- --- --- --- --- --- --- --- --- ---
 
-## setzt zwei Spalten in der Tabelle Matrix-Ueber-unter gleich; Vorraussetzung ist, dass keine Logikfehler entstehen, was im unteren Teil der Funktion geprüft wird
+## setzt zwei Spalten in der Tabelle Matrix-Ueber-unter gleich; Vorraussetzung ist, dass keine Logikfehler entstehen, was im unteren Teil der Funktion geprueft wird
 gleichsetzen_spalten <- function(tabelle, zu_veraendernde_zeile, vorlage_zeile)
 
 {
@@ -83,9 +83,9 @@ gleichsetzen_spalten <- function(tabelle, zu_veraendernde_zeile, vorlage_zeile)
 # --- --- --- --- --- --- --- --- --- --- --- ---
 
 widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_loeschen = FALSE)
-  # innerer Kern der Widerspruchs-Analyse, mit Auswahl, ob Fehler gelöscht werden sollen oder Programm abbricht
-  # wenn hier ein Widerspruch auftreten würde (die Funktion gebraucht würde) müsste sie mit der nicht angewandten Funktion "Fehlerkorrektur"...
-  #...verknüpft werden, die Schleife müsste unterbrochen, der Fehler gefunden und neu begonnen werden:
+  # innerer Kern der Widerspruchs-Analyse, mit Auswahl, ob Fehler geloescht werden sollen oder Programm abbricht
+  # wenn hier ein Widerspruch auftreten wuerde (die Funktion gebraucht wuerde) muesste sie mit der nicht angewandten Funktion "Fehlerkorrektur"...
+  #...verknuepft werden, die Schleife muesste unterbrochen, der Fehler gefunden und neu begonnen werden:
   # der Schalter "initiale_pruefung" ist erforderlich, da beim ersten Durchlauf keine Suche der Fehlerkette erforderlich ist
   # ...der Fehler ergibt sich direkt aus den eingegebenen Werten
 
@@ -93,12 +93,12 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
   befundname_zeile <- row.names(matrix_gleich)[zeilennr]
   befundname_spalte <- row.names(matrix_gleich)[spaltennr]
   #print(matrix_gleich)
-  ## 1. "Kehrwerte" (z. B. 3 über 4 und 4 über 3):
+  ## 1. "Kehrwerte" (z. B. 3 ueber 4 und 4 ueber 3):
   if (matrix_ueber_unter[zeilennr, spaltennr] == 1 && matrix_ueber_unter[spaltennr, zeilennr] == 1 && !(spaltennr == zeilennr))
   {
     if(fehler_loeschen == TRUE)
     {
-      ## Widerspruch wird beidseitig gelöscht (z. B. 3 über 4 und 4 über 3):
+      ## Widerspruch wird beidseitig geloescht (z. B. 3 ueber 4 und 4 ueber 3):
       matrix_ueber_unter[zeilennr, spaltennr] <<- 0
       matrix_ueber_unter[spaltennr, zeilennr] <<- 0
       print(paste("Widerspruch Kehrwert aufgetreten in Zeile:" , zeilennr));
@@ -122,14 +122,14 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
     }
   }
 
-  ## Wert gleichzeitig über und gleich (3 über 3 und 3 = 3):
+  ## Wert gleichzeitig ueber und gleich (3 ueber 3 und 3 = 3):
   if (matrix_ueber_unter[zeilennr, spaltennr] == 1 && matrix_gleich[zeilennr, spaltennr] == 1)
   {
     if(fehler_loeschen == TRUE)
     {
       matrix_ueber_unter[zeilennr, spaltennr] <<- 0
       matrix_gleich[zeilennr, spaltennr] <<- 0
-      print(paste("Widerspruch über/unter aber auch gleich aufgetreten in Zeile:" , zeilennr));
+      print(paste("Widerspruch ueber/unter aber auch gleich aufgetreten in Zeile:" , zeilennr));
     }
     else if (initiale_pruefung == TRUE)
     {
@@ -140,28 +140,28 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
       widerspruch_teil_ii <- c(befundname_zeile, "gleich", befundname_spalte)
       widerspruchskette <- ausgabe_widerspruchskette(widerspruch_teil_i, widerspruch_teil_ii)
       print(widerspruchskette)
-      stop(paste("Widerspruch über/unter aber auch gleich aufgetreten in Zeile:" , zeilennr, "Spalte:", spaltennr))
+      stop(paste("Widerspruch ueber/unter aber auch gleich aufgetreten in Zeile:" , zeilennr, "Spalte:", spaltennr))
     }
     else
     {
       widerspruchskette <- suche_fehlerkette(befundname_zeile)
       print(widerspruchskette)
       abbrechen <- TRUE
-      stop(paste("Widerspruch über/unter aber auch gleich aufgetreten in Zeile:" , zeilennr, "Spalte:", spaltennr))
+      stop(paste("Widerspruch ueber/unter aber auch gleich aufgetreten in Zeile:" , zeilennr, "Spalte:", spaltennr))
     }
   }
 
-  ## Diagonale besetzt in der Über-Unter-Tabelle (3 über 3):
-  ## dieser Fall wird gleich gelöscht, da es sich um einen offensichtlichen Fehler handelt...
+  ## Diagonale besetzt in der ueber-Unter-Tabelle (3 ueber 3):
+  ## dieser Fall wird gleich geloescht, da es sich um einen offensichtlichen Fehler handelt...
   ##...ohne sinnvolle Korrekturoptionen
   if(spaltennr == 1)
-    ## dieser Test soll nur einmal bei der ersten Spalte der Zeile durchgeführt werden...
-    ##...da sonst bei jeder Spalte der Zeile der gleiche Test durchläuft
+    ## dieser Test soll nur einmal bei der ersten Spalte der Zeile durchgefuehrt werden...
+    ##...da sonst bei jeder Spalte der Zeile der gleiche Test durchlaeuft
   {
     if (matrix_ueber_unter[zeilennr, zeilennr] == 1)
     {
       matrix_ueber_unter[zeilennr, zeilennr] <- 0
-      print(paste("Diagonale freigeräumt in Über-Unter-Tabelle, Zeile:" , zeilennr));
+      print(paste("Diagonale freigeraeumt in ueber-Unter-Tabelle, Zeile:" , zeilennr));
     }
   }
 }
@@ -193,7 +193,7 @@ suche_fehlerkette <- function(gesuchte_stelle)
 {
   print(paste("gesuchte Stelle:" , gesuchte_stelle));
   ## Wenn in der Funktion "Widerspruchsanalyse" ein Fehler aufgetreten ist, wird diese Funktion aufgerufen
-  ## verfolgt die Fehlerkette in den ursprünglichen Daten ("liste_alle_beziehungen") ausgehend von der Stelle, in der der Fehler festgestellt wurde
+  ## verfolgt die Fehlerkette in den urspruenglichen Daten ("liste_alle_beziehungen") ausgehend von der Stelle, in der der Fehler festgestellt wurde
 
   liste_alle_beziehungen <- rbind(liste_ueber_temp, liste_gleich_temp)
 
@@ -217,27 +217,27 @@ suche_fehlerkette <- function(gesuchte_stelle)
     {
       liste_rest <- rbind(liste_rest, liste_rest_gleich_2)
     }
-    # alle Datensätze abfragen, die gesuchtes Attribut enthalten:
+    # alle Datensaetze abfragen, die gesuchtes Attribut enthalten:
     abgefragte_liste <- subset(liste_rest, liste_rest[,1] %in% abfrage)
 
     # Liste mit restlichen Beziehungen erstellen, denn einmal verwendete Beziehungen werden (wahrscheinlich) nicht mehr gebraucht:
     liste_rest <- subset(liste_rest, !(liste_rest[,1] %in% abfrage))
 
-    ## Gegenwerte bei gleich löschen:
+    ## Gegenwerte bei gleich loeschen:
     # zuerst eine Abfrage mit allen Gleich-Werten, die bei diesem Durchlauf verwendet wurden:
     abgefragte_liste_gleich <- subset(abgefragte_liste, abgefragte_liste[,2] == "gleich")
     # rechte Seite der abgefragten Gleich-Beziehungen:
     abgefragte_liste_gleich <- array(abgefragte_liste_gleich[,3])
 
-    # beim zweiten Durchgang müssen die gesicherten Gleich-Beziehungen verschoben werden:
+    # beim zweiten Durchgang muessen die gesicherten Gleich-Beziehungen verschoben werden:
     if(listennummer > 1)
     {
       liste_rest_gleich_2 <- liste_rest_gleich
     }
 
-    # Sichern der Gegenwerte für die übernächste Runde:
+    # Sichern der Gegenwerte fuer die uebernaechste Runde:
     liste_rest_gleich <- subset(liste_rest, liste_rest[,1] %in% abgefragte_liste_gleich & liste_rest[,2] == "gleich" & liste_rest[,3] %in% abfrage)
-    # Entfernen der Gegenwerte für eine Runde, bei 1 = 3 z.B. 3:
+    # Entfernen der Gegenwerte fuer eine Runde, bei 1 = 3 z.B. 3:
     liste_rest <- subset(liste_rest, !(liste_rest[,1] %in% abgefragte_liste_gleich & liste_rest[,2] == "gleich" & liste_rest[,3] %in% abfrage))
 
     # nun die neue Abfrage erstellen:
@@ -250,31 +250,31 @@ suche_fehlerkette <- function(gesuchte_stelle)
     assign(paste("liste_", listennummer, sep=''), abgefragte_liste)
     listennummer <- listennummer + 1
 
-    # prüfen, ob Weg zu gesuchter Stelle gefunde wurde:
-    # hier fehlt noch irgendeine Art error.handler, damit die Schleife bei einem Fehler nicht unendlich weiterläuft!!!
+    # pruefen, ob Weg zu gesuchter Stelle gefunde wurde:
+    # hier fehlt noch irgendeine Art error.handler, damit die Schleife bei einem Fehler nicht unendlich weiterlaeuft!!!
     if (gesuchte_stelle %in% abfrage) break()
-    # Sicherung gegen Endlossschleife: wenn mehr Durchläufe als Beziehungen:
+    # Sicherung gegen Endlossschleife: wenn mehr Durchlaeufe als Beziehungen:
     if (listennummer > nrow(liste_alle_beziehungen))
     {
-      stop("das Programm konnte keinen Widerspruch in der Stratigrafie ermitteln, was auf einen internen Fehler zurückzuführen ist!")
+      stop("das Programm konnte keinen Widerspruch in der Stratigrafie ermitteln, was auf einen internen Fehler zurueckzufuehren ist!")
     }
   }
 
 
 # --- --- --- Vorbereitung Rueckweg von Fehler zu Ausgangspunkt --- --- ---
-  # da die Listen bislang alle Beziehungen enthalten die von der Fehlerursache ausgehen, muss diese nun rückwärts durchlaufen werden
-  # ...damit am Ende ein einziger Pfad als Fehlerkette übrig bleibt
-  # ...entspricht im Grunde einer Datenbankabfrage der "gesuchten_stelle" über alle Tabelle (z. B. liste_5, liste_4...)
-  # ...ähnelt sehr stark der obigen Schleife
+  # da die Listen bislang alle Beziehungen enthalten die von der Fehlerursache ausgehen, muss diese nun rueckwaerts durchlaufen werden
+  # ...damit am Ende ein einziger Pfad als Fehlerkette uebrig bleibt
+  # ...entspricht im Grunde einer Datenbankabfrage der "gesuchten_stelle" ueber alle Tabelle (z. B. liste_5, liste_4...)
+  # ...aehnelt sehr stark der obigen Schleife
 
-  # zunächst muss die listennummer um 2 herabgesetzt werden, da im letzten Schritt in der obigen Schleife keine Liste mehr angelegt wurde:
+  # zunaechst muss die listennummer um 2 herabgesetzt werden, da im letzten Schritt in der obigen Schleife keine Liste mehr angelegt wurde:
   listennummer <- listennummer - 1
 
   # Abfrage wird wieder gleich gesuchte Stelle gesetzt:
   abfrage <- gesuchte_stelle
 
   # Tabelle Widerspruchskette muss vorab definiert werden:
-  # muss nacher noch schöner gelöst werden, ist schließlich die Fehlerausgabe für den Benutzer!!!
+  # muss nacher noch schoener geloest werden, ist schließlich die Fehlerausgabe fuer den Benutzer!!!
   widerspruchskette <- matrix(data=0, nrow = 0, ncol = 3)
 
 # --- --- --- Schleife Rueckweg --- --- ---
@@ -284,9 +284,9 @@ suche_fehlerkette <- function(gesuchte_stelle)
     # aus der Listennummer wird die aktuelle Liste erstellt:
     abgefragte_liste <- eval(as.name(paste("liste_", listennummer, sep='')))
     abgefragte_liste <- subset(abgefragte_liste, abgefragte_liste[,3] %in% abfrage)
-    # und wieder mit "assign" wird die "abgefragte_liste" erneut an die entsprechende Liste "liste_1", "liste_2" etc. übergeben:
+    # und wieder mit "assign" wird die "abgefragte_liste" erneut an die entsprechende Liste "liste_1", "liste_2" etc. uebergeben:
     assign(paste("liste_", listennummer, sep=''), abgefragte_liste)
-    # hiermit wird der Wert für die nächste Abfrage im folgenden Durchlauf geholt:
+    # hiermit wird der Wert fuer die naechste Abfrage im folgenden Durchlauf geholt:
     abfrage <- array(abgefragte_liste[,1])
 
     widerspruchskette <- ausgabe_widerspruchskette(widerspruchskette, abgefragte_liste)
