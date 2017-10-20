@@ -55,8 +55,6 @@ befuellen_matrix <- function(ausgangsmatrix, liste_ueber_etc)
   return(ausgangsmatrix)
 }
 
-
-
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 # --- --- --- --- --- FUNKTION gleichsetzen_spalten --- --- --- --- --- --- ----
@@ -82,14 +80,20 @@ gleichsetzen_spalten <- function(tabelle, zu_veraendernde_zeile, vorlage_zeile)
 
 # --- --- --- --- --- --- --- --- --- --- --- ---
 
-widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_loeschen = FALSE)
+widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_loeschen = FALSE, matrix_gleich, matrix_ueber_unter, liste_ueber_temp, liste_gleich_temp)
   # innerer Kern der Widerspruchs-Analyse, mit Auswahl, ob Fehler geloescht werden sollen oder Programm abbricht
   # wenn hier ein Widerspruch auftreten wuerde (die Funktion gebraucht wuerde) muesste sie mit der nicht angewandten Funktion "Fehlerkorrektur"...
   #...verknuepft werden, die Schleife muesste unterbrochen, der Fehler gefunden und neu begonnen werden:
   # der Schalter "initiale_pruefung" ist erforderlich, da beim ersten Durchlauf keine Suche der Fehlerkette erforderlich ist
   # ...der Fehler ergibt sich direkt aus den eingegebenen Werten
 
+  ################
+  # Fehlerausgabe funktioniert bislang nur für die Fällen nicht initiale Prüfung und nicht Fehler löschen – muss noch überarbeitet werden
+  ################
 {
+  abbrechen <- FALSE
+  conflict <- "no conflicts found"
+  widerspruchskette <- "none"
   befundname_zeile <- row.names(matrix_gleich)[zeilennr]
   befundname_spalte <- row.names(matrix_gleich)[spaltennr]
   #print(matrix_gleich)
@@ -99,9 +103,9 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
     if(fehler_loeschen == TRUE)
     {
       ## Widerspruch wird beidseitig geloescht (z. B. 3 ueber 4 und 4 ueber 3):
-      matrix_ueber_unter[zeilennr, spaltennr] <<- 0
-      matrix_ueber_unter[spaltennr, zeilennr] <<- 0
-      print(paste("Widerspruch Kehrwert aufgetreten in Zeile:" , zeilennr));
+      matrix_ueber_unter[zeilennr, spaltennr] <- 0
+      matrix_ueber_unter[spaltennr, zeilennr] <- 0
+      conflict <- paste("Widerspruch Kehrwert aufgetreten in Zeile:" , zeilennr)
     }
     else if (initiale_pruefung == TRUE)
       # beim ersten Durchlauf muss nicht die Funktion "suche_fehlerkette" aktiviert werden,
@@ -109,16 +113,15 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
     {
       widerspruch_teil_i <- c(befundname_zeile, "ueber", befundname_spalte)
       widerspruch_teil_ii <- c(befundname_zeile, "unter", befundname_spalte)
+      abbrechen <- TRUE
       widerspruchskette <- ausgabe_widerspruchskette(widerspruch_teil_i, widerspruch_teil_ii)
-      print(widerspruchskette)
-      stop(paste("abgebrochen, da Kehrwert aufgetreten in Zeile: ", zeilennr))
+      conflict <- paste("abgebrochen, da Kehrwert aufgetreten in Zeile: ", zeilennr)
     }
     else
     {
-      widerspruchskette <- suche_fehlerkette(befundname_zeile)
-      print(widerspruchskette)
+      widerspruchskette <- suche_fehlerkette(befundname_zeile, liste_ueber_temp, liste_gleich_temp)
       abbrechen <- TRUE
-      stop(paste("abgebrochen, da Kehrwert aufgetreten in Zeile: ", zeilennr))
+      conflict <- paste("abgebrochen, da Kehrwert aufgetreten in Zeile: ", zeilennr)
     }
   }
 
@@ -127,9 +130,9 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
   {
     if(fehler_loeschen == TRUE)
     {
-      matrix_ueber_unter[zeilennr, spaltennr] <<- 0
-      matrix_gleich[zeilennr, spaltennr] <<- 0
-      print(paste("Widerspruch ueber/unter aber auch gleich aufgetreten in Zeile:" , zeilennr));
+      matrix_ueber_unter[zeilennr, spaltennr] <- 0
+      matrix_gleich[zeilennr, spaltennr] <- 0
+      conflict <- paste("Widerspruch ueber/unter aber auch gleich aufgetreten in Zeile:" , zeilennr)
     }
     else if (initiale_pruefung == TRUE)
     {
@@ -139,15 +142,15 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
       widerspruch_teil_i <- c(befundname_zeile, "ueber", befundname_spalte)
       widerspruch_teil_ii <- c(befundname_zeile, "gleich", befundname_spalte)
       widerspruchskette <- ausgabe_widerspruchskette(widerspruch_teil_i, widerspruch_teil_ii)
-      print(widerspruchskette)
-      stop(paste("Widerspruch ueber/unter aber auch gleich aufgetreten in Zeile:" , zeilennr, "Spalte:", spaltennr))
+      abbrechen <- TRUE
+      conflict <- paste("Widerspruch ueber/unter aber auch gleich aufgetreten in Zeile:" , zeilennr, "Spalte:", spaltennr)
     }
     else
     {
-      widerspruchskette <- suche_fehlerkette(befundname_zeile)
-      print(widerspruchskette)
+      #hier ist der Fehler!!!
+      widerspruchskette <- suche_fehlerkette(befundname_zeile, liste_ueber_temp, liste_gleich_temp)
       abbrechen <- TRUE
-      stop(paste("Widerspruch ueber/unter aber auch gleich aufgetreten in Zeile:" , zeilennr, "Spalte:", spaltennr))
+      conflict <- paste("Widerspruch ueber/unter aber auch gleich aufgetreten in Zeile:" , zeilennr, "Spalte:", spaltennr)
     }
   }
 
@@ -161,9 +164,13 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
     if (matrix_ueber_unter[zeilennr, zeilennr] == 1)
     {
       matrix_ueber_unter[zeilennr, zeilennr] <- 0
-      print(paste("Diagonale freigeraeumt in ueber-Unter-Tabelle, Zeile:" , zeilennr));
+      conflict <- paste("Diagonale freigeraeumt in ueber-Unter-Tabelle, Zeile:" , zeilennr)
     }
   }
+
+
+  report_of_conflict <- list(break_req = abbrechen, Conflict = conflict, chain_of_conflict = widerspruchskette)
+  return(report_of_conflict)
 }
 
 
@@ -189,7 +196,7 @@ ausgabe_widerspruchskette <- function(bisherige_widerspruchskette, ergaenzung)
 
 # --- --- --- --- --- --- --- --- --- --- --- ---
 
-suche_fehlerkette <- function(gesuchte_stelle)
+suche_fehlerkette <- function(gesuchte_stelle, liste_ueber_temp, liste_gleich_temp)
 {
   print(paste("gesuchte Stelle:" , gesuchte_stelle));
   ## Wenn in der Funktion "Widerspruchsanalyse" ein Fehler aufgetreten ist, wird diese Funktion aufgerufen
@@ -355,15 +362,15 @@ liste_alle_befunde_mit_dat <- function(liste_stellen, liste_absolute_datierungen
 
 kuerzen_matrix <- function(matrix1)
 {
-  #L?schen absolut datierter Zeilen... (Alle au?er NAs)
+  #Loeschen absolut datierter Zeilen... (Alle ausser NAs)
   no_NA_index <- which(!is.na(matrix1[2:nrow(matrix1),1]))+1   #gibt Vektor mit absolut datierten Zeilen an.
-  #2:nrow, da die erste Zeile die Datierungen enth?lt.
+  #2:nrow, da die erste Zeile die Datierungen enthaelt.
   #"+1", da wegen 2:ncol die zweite Spalte als erste gez?hlte wird etc.
   matrix1 <- matrix1[-no_NA_index,]
 
   #...und nicht absolut datierter Spalten (Alle NAs)
   NA_index <- which(is.na(matrix1[1,2:ncol(matrix1)]))+1   #gibt Vektor mit nicht absolut datierten Spalten an.
-  #2:ncol, da die erste Spalte die Datierungen enth?lt.
+  #2:ncol, da die erste Spalte die Datierungen enthaelt.
   #"+1", da wegen 2:ncol die zweite Spalte als erste gez?hlte wird etc.
   matrix1 <- matrix1[,-NA_index]
 
@@ -408,7 +415,7 @@ erstelle_tabelle <- function(matrix_ueber, matrix_unter, liste_daten_gesamt)
   }# Ende for-loop
 
 
-  #Anh?ngen der aelter/gleich Beziehungen
+  #Anhaengen der aelter/gleich Beziehungen
   date_relation <- rbind(date_relation, c("Befund", "datiert den Befund","auf das Datum aelter/gleich"))
 
   # nimmt die als erste belegte Position aus den Zeilen der matrix_unter und f?gt diese bei aelter/gleich ein
