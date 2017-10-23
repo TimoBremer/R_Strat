@@ -86,12 +86,11 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
   #...verknuepft werden, die Schleife muesste unterbrochen, der Fehler gefunden und neu begonnen werden:
   # der Schalter "initiale_pruefung" ist erforderlich, da beim ersten Durchlauf keine Suche der Fehlerkette erforderlich ist
   # ...der Fehler ergibt sich direkt aus den eingegebenen Werten
+  # throws out nothing if no conflicts were found, updated tables if "fehler_loeschen = TRUE" or otherwise a conflict report
 
-  ################
-  # Fehlerausgabe funktioniert bislang nur für die Fällen nicht initiale Prüfung und nicht Fehler löschen – muss noch überarbeitet werden
-  ################
 {
   abbrechen <- FALSE
+  correction <- FALSE
   conflict <- "no conflicts found"
   widerspruchskette <- "none"
   befundname_zeile <- row.names(matrix_gleich)[zeilennr]
@@ -103,9 +102,10 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
     if(fehler_loeschen == TRUE)
     {
       ## Widerspruch wird beidseitig geloescht (z. B. 3 ueber 4 und 4 ueber 3):
+      print(paste("Widerspruch Kehrwert aufgetreten in Zeile:" , zeilennr))
       matrix_ueber_unter[zeilennr, spaltennr] <- 0
       matrix_ueber_unter[spaltennr, zeilennr] <- 0
-      conflict <- paste("Widerspruch Kehrwert aufgetreten in Zeile:" , zeilennr)
+      correction <- TRUE
     }
     else if (initiale_pruefung == TRUE)
       # beim ersten Durchlauf muss nicht die Funktion "suche_fehlerkette" aktiviert werden,
@@ -130,9 +130,10 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
   {
     if(fehler_loeschen == TRUE)
     {
+      print(paste("Widerspruch ueber/unter aber auch gleich aufgetreten in Zeile:" , zeilennr))
       matrix_ueber_unter[zeilennr, spaltennr] <- 0
       matrix_gleich[zeilennr, spaltennr] <- 0
-      conflict <- paste("Widerspruch ueber/unter aber auch gleich aufgetreten in Zeile:" , zeilennr)
+      correction <- TRUE
     }
     else if (initiale_pruefung == TRUE)
     {
@@ -168,9 +169,19 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
     }
   }
 
-
-  report_of_conflict <- list(break_req = abbrechen, Conflict = conflict, chain_of_conflict = widerspruchskette)
-  return(report_of_conflict)
+## the output of the function is depending whether it was called with the option "fehler_loeschen = TRUE" or "FALSE".
+## ...In the first case it returns a corrected version of the stratigraphic tables
+## ...in the latter case a report of conflict
+  if (fehler_loeschen == TRUE && correction == TRUE)
+  {
+    tab_under_above_and_equal <- list(corr_req = correction, break_req = abbrechen, tab_under_above = matrix_ueber_unter, tab_equal = matrix_gleich)
+    return(tab_under_above_and_equal)
+  }
+  else
+  {
+    report_of_conflict <- list(corr_req = correction, break_req = abbrechen, Conflict = conflict, chain_of_conflict = widerspruchskette)
+    return(report_of_conflict)
+  }
 }
 
 
