@@ -4,6 +4,7 @@
 
 # Uebersetzt 1. die Unter-Liste in eine ueber-Liste und fuehrt diese mit der bestehenden ueberliste-zusammen
 # 2. wird die Gleich-Liste um umgekehrte Ausdruecke ergaenzt (3 = 5 und 5 = 3)
+
 ergaenzen_listen <- function(liste_zu_ergaenzen, liste_zu_veraendern = liste_zu_ergaenzen)
 
 {
@@ -27,6 +28,8 @@ ergaenzen_listen <- function(liste_zu_ergaenzen, liste_zu_veraendern = liste_zu_
   {
     liste_zu_ergaenzen[liste_zu_ergaenzen == "unter"] = "ueber"
   }
+
+  analysis_functions_objects()
 
   return(liste_zu_ergaenzen)
 }
@@ -52,6 +55,9 @@ befuellen_matrix <- function(ausgangsmatrix, liste_ueber_etc)
       #print(paste("fortlaufende Nr.: " , fortl_nr , "; ", liste_ueber_etc[,1], "ueber ", liste_ueber_etc[,3] , "Ende"))
     } ## Ende for-Loop
   }
+
+  analysis_functions_objects()
+
   return(ausgangsmatrix)
 }
 
@@ -69,6 +75,9 @@ gleichsetzen_spalten <- function(tabelle, zu_veraendernde_zeile, vorlage_zeile)
   temp_matrix <- tabelle[c(zu_veraendernde_zeile,vorlage_zeile),]
   ## vorlaeufiges Gleichsetzen der beiden Spalten:
   tabelle[zu_veraendernde_zeile,] <- apply(temp_matrix,2,max)
+
+  analysis_functions_objects()
+
   return(tabelle)
 } ## Ende Funktion
 
@@ -77,8 +86,6 @@ gleichsetzen_spalten <- function(tabelle, zu_veraendernde_zeile, vorlage_zeile)
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 # --- --- --- --- --- FUNKTION widerspruchsanalyse --- --- --- --- --- --- ----
-
-# --- --- --- --- --- --- --- --- --- --- --- ---
 
 widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_loeschen = FALSE, matrix_gleich, matrix_ueber_unter, liste_ueber_temp, liste_gleich_temp)
   # innerer Kern der Widerspruchs-Analyse, mit Auswahl, ob Fehler geloescht werden sollen oder Programm abbricht
@@ -102,7 +109,7 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
     if(fehler_loeschen == TRUE)
     {
       ## Widerspruch wird beidseitig geloescht (z. B. 3 ueber 4 und 4 ueber 3):
-      print(paste("Widerspruch Kehrwert aufgetreten in Zeile:" , zeilennr))
+      print(paste("Widerspruch Kehrwert aufgetreten in Zeile:" , zeilennr, "corrigated"))
       matrix_ueber_unter[zeilennr, spaltennr] <- 0
       matrix_ueber_unter[spaltennr, zeilennr] <- 0
       correction <- TRUE
@@ -130,7 +137,7 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
   {
     if(fehler_loeschen == TRUE)
     {
-      print(paste("Widerspruch ueber/unter aber auch gleich aufgetreten in Zeile:" , zeilennr))
+      print(paste("Widerspruch ueber/unter aber auch gleich aufgetreten in Zeile:" , zeilennr, "corrigated"))
       matrix_ueber_unter[zeilennr, spaltennr] <- 0
       matrix_gleich[zeilennr, spaltennr] <- 0
       correction <- TRUE
@@ -172,14 +179,17 @@ widerspruchsanalyse <- function(zeilennr, spaltennr, initiale_pruefung, fehler_l
 ## the output of the function is depending whether it was called with the option "fehler_loeschen = TRUE" or "FALSE".
 ## ...In the first case it returns a corrected version of the stratigraphic tables
 ## ...in the latter case a report of conflict
-  if (fehler_loeschen == TRUE && correction == TRUE)
+  if (fehler_loeschen == TRUE && correction == TRUE)  ## the function returns a corrigated list if "fehler loeschen" is taged
   {
     tab_under_above_and_equal <- list(corr_req = correction, break_req = abbrechen, tab_under_above = matrix_ueber_unter, tab_equal = matrix_gleich)
     return(tab_under_above_and_equal)
   }
-  else
+  else ## otherwise it returns a report of conflict
   {
     report_of_conflict <- list(corr_req = correction, break_req = abbrechen, Conflict = conflict, chain_of_conflict = widerspruchskette)
+
+    analysis_functions_objects()
+
     return(report_of_conflict)
   }
 }
@@ -196,6 +206,9 @@ ausgabe_widerspruchskette <- function(bisherige_widerspruchskette, ergaenzung)
 {
   trennlinie_schichten <- c("........", "........", "........")
   widerspruchskette <- rbind(ergaenzung, trennlinie_schichten, bisherige_widerspruchskette)
+
+  analysis_functions_objects()
+
   return(widerspruchskette)
 }
 
@@ -309,6 +322,10 @@ suche_fehlerkette <- function(gesuchte_stelle, liste_ueber_temp, liste_gleich_te
 
     widerspruchskette <- ausgabe_widerspruchskette(widerspruchskette, abgefragte_liste)
   }
+
+  analysis_functions_objects()
+
+
   return(widerspruchskette)
 
     # Einzellisten koennte man in grosse Liste zusammenfuehren, weiss aber noch nicht, wozu das nuetzlich ist
@@ -323,18 +340,18 @@ suche_fehlerkette <- function(gesuchte_stelle, liste_ueber_temp, liste_gleich_te
 
 # --- --- --- --- --- --- --- --- --- --- --- ---
 
-liste_alle_befunde_mit_dat <- function(liste_stellen, liste_absolute_datierungen, matrix1)
+liste_alle_befunde_mit_dat <- function(liste_stellen, absolute_data_list, matrix1)
 {
 
   liste_alle_befunde_mit_dat <- matrix(data=NA, nrow = length(liste_stellen), ncol = 2)
-  colnames(liste_alle_befunde_mit_dat)  <- c(colnames(liste_absolute_datierungen))
+  colnames(liste_alle_befunde_mit_dat)  <- c(colnames(absolute_data_list))
 
   liste_alle_befunde_mit_dat[,1] <- liste_stellen
 
   liste_alle_befunde_mit_dat <- as.matrix(liste_alle_befunde_mit_dat)
-  liste_absolute_datierungen <- as.matrix(liste_absolute_datierungen)
+  absolute_data_list <- as.matrix(absolute_data_list)
 
-  liste_alle_befunde_mit_dat <- rbind(liste_alle_befunde_mit_dat, liste_absolute_datierungen)#hier wird das irgendwie zu einer Liste :(, durch as.matrix verhindert
+  liste_alle_befunde_mit_dat <- rbind(liste_alle_befunde_mit_dat, absolute_data_list)#hier wird das irgendwie zu einer Liste :(, durch as.matrix verhindert
 
   # Sortieren der Liste
   liste_alle_befunde_mit_dat <- liste_alle_befunde_mit_dat[order(liste_alle_befunde_mit_dat[,1]),]
@@ -358,6 +375,9 @@ liste_alle_befunde_mit_dat <- function(liste_stellen, liste_absolute_datierungen
       }# Ende for-loop2
     }# Ende if-loop1
   }# Ende for-loop1
+
+
+  analysis_functions_objects()
 
   return(liste_alle_befunde_mit_dat)
 
@@ -386,7 +406,9 @@ kuerzen_matrix <- function(matrix1)
   matrix1 <- matrix1[,-NA_index]
 
 
-return(matrix1)
+  analysis_functions_objects()
+
+  return(matrix1)
 
 }#end function
 
@@ -461,6 +483,35 @@ erstelle_tabelle <- function(matrix_ueber, matrix_unter, liste_daten_gesamt)
   # Sortieren der Tabelle
   tabelle_final <- tabelle_final[order(tabelle_final[,3], decreasing = TRUE),]
 
+  analysis_functions_objects()
+
   return(tabelle_final)
 
 }# end function
+
+# --- --- --- --- --- FUNCTION analysis_functions_objects --- --- --- --- --- --- ----
+
+# --- --- --- --- --- --- --- --- --- --- --- ---
+analysis_functions_objects<- function()
+{
+  analyse = TRUE
+  # analyse = FALSE
+
+  if (analyse == TRUE)
+  {
+    name_of_function <- sys.call(which = -1)
+    name_of_calling_function <- sys.call(which = -2)
+
+    calling_environment <- parent.frame()
+    objects_in_function <- ls(calling_environment)
+
+    if (!exists("list_functions_and_objects"))
+    {
+      list_functions_and_objects <<- list(name_of_calling_function, name_of_function, objects_in_function)
+      names(list_functions_and_objects) <<- c("calling function", "function", "objects")
+    }
+
+    list_functions_and_objects <<- rbind(list_functions_and_objects, list(name_of_calling_function, name_of_function, objects_in_function))
+    list_functions_and_objects <<- unique(list_functions_and_objects)
+  }
+}

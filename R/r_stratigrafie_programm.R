@@ -1,8 +1,17 @@
-# ich habe die Globalvariablen herausgenommen und konnte bislang keinen Bug feststellen – im Auge behalten!
-# ...konnte insbesondere in der Fehleranalyse zu Bugs führen, wenn matrix_gleich und matrix_ueber_unter nicht mehr
-#...global definiert sind
+#' Stratifying archaeological data
+#'
+#' \code{RStratigraphy} returns different tables in which logical relations between a stratified data are completed, as well as their absolute datings. In addition, logical mistakes in the dataset are revealed.
+#'
+#' @export
+#' @param strat_list A table of three columns and n rows, containing all known relations between the features. The first row has to name the columns. The first and the third columns contains the names of the features, where as the second column containes the relation in form of "above", "under" or "equal".
+#' @param absolute_data_list A table of two columns and n rows, containing all known absolute datings of dated features. The first row has to name the columns. The first column contains the name of the feature, the second one the datings as numeric number.
+#' @param fehler_loeschen A function, that automaticly erases logical mistakes in your stratigraphy if set on TRUE. WARNING! This function does not establish scientifically correct data!
+#' @return A list of tables: under-above-relation of the features = tab_under_above, equal features = tab_equal, absolute datings of features = absolute_chronology.
+#' @examples
+#' RStratigraphy <- function(strat_list, absolute_data_list, fehler_loeschen)
 
-RStratigraphy <- function(liste_stratigrafie, liste_absolute_datierungen, fehler_loeschen)
+
+RStratigraphy <- function(strat_list, absolute_data_list, fehler_loeschen)
 {
 
   # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -12,13 +21,13 @@ RStratigraphy <- function(liste_stratigrafie, liste_absolute_datierungen, fehler
   # --- --- --- --- --- --- --- --- --- --- --- ---
 
   # Liste in Typ "character" umwandeln, da numerische und nicht numerische Befundbezeichnungen sonst nicht gleich behandelt werden:
-  liste_stratigrafie[] <- lapply(liste_stratigrafie, as.character)
+  strat_list[] <- lapply(strat_list, as.character)
 
   # Erstellen einzelner Listen nach Lageverhaeltnis der Befunde untereinander:
   # Die Temp-Tabellen werden von der Fehlerkontrolle verwendet!
-  liste_ueber_temp <- subset(liste_stratigrafie, liste_stratigrafie[,2] == "ueber")
-  liste_unter_temp <- subset(liste_stratigrafie, liste_stratigrafie[,2] == "unter")
-  liste_gleich_temp <- subset(liste_stratigrafie, liste_stratigrafie[,2] == "gleich")
+  liste_ueber_temp <- subset(strat_list, strat_list[,2] == "ueber")
+  liste_unter_temp <- subset(strat_list, strat_list[,2] == "unter")
+  liste_gleich_temp <- subset(strat_list, strat_list[,2] == "gleich")
 
   # Listen vervollstaendigen und fuer die Befuellung der Matrix vorbereiten
   # Unter-Liste in Ueber-Liste uebersetzen und mit bestehender ueber-Liste zusammenfuehren:
@@ -32,7 +41,7 @@ RStratigraphy <- function(liste_stratigrafie, liste_absolute_datierungen, fehler
 
   # Liste mit allen beteiligten Stellen erstellen
   # Liste Stellen wird aus Spalte links und Spalte rechts erstellt:
-  liste_stellen <- c(array(liste_stratigrafie[,1]),array(liste_stratigrafie[,3]))
+  liste_stellen <- c(array(strat_list[,1]),array(strat_list[,3]))
 
   # Sortieren der Stellen:
   liste_stellen <- liste_stellen[order(liste_stellen)]
@@ -80,6 +89,11 @@ RStratigraphy <- function(liste_stratigrafie, liste_absolute_datierungen, fehler
         print(report_of_conflict$chain_of_conflict)
         return(report_of_conflict)
         }
+        else if (report_of_conflict$corr_req == TRUE)
+        {
+        matrix_ueber_unter <- report_of_conflict$tab_under_above
+        matrix_gleich <- report_of_conflict$tab_equal
+        }
       }
     }
   }
@@ -125,13 +139,17 @@ RStratigraphy <- function(liste_stratigrafie, liste_absolute_datierungen, fehler
             print(report_of_conflict$chain_of_conflict)
             return(report_of_conflict)
           }
+          else if (report_of_conflict$corr_req == TRUE)
+          {
+            matrix_ueber_unter <- report_of_conflict$tab_under_above
+            matrix_gleich <- report_of_conflict$tab_equal
+          }
         }
       }
     } # Ende Schleife Zeilennr. = 1
     if (summe_matrix_ueber_unter == sum(rowSums(matrix_ueber_unter)) && summe_matrix_gleich == sum(colSums(matrix_gleich))) break()
     print(paste("        Durchlauf:" , durchlaeufe, "abgeschlossen"))
     durchlaeufe <- durchlaeufe +1
-
   } # Ende Repeat-Schleife
 
   # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -139,17 +157,36 @@ RStratigraphy <- function(liste_stratigrafie, liste_absolute_datierungen, fehler
   # --- --- --- --- --- Ergaenzen absoluter Datierungen --- --- --- --- --- --- ----
 
   # --- --- --- --- --- --- --- --- --- --- --- ---
-
-  absolute_chronology <- absolute_datierungen(liste_absolute_datierungen, liste_stellen, matrix_gleich, matrix_ueber_unter)
-
+print("Starting absolute datings...")
+  if (missing(absolute_data_list))
+  {
+    absolute_chronology <- "absolute datings not existing"
+  }
+  else
+  {
+    absolute_chronology <- absolute_datierungen(absolute_data_list, liste_stellen, matrix_gleich, matrix_ueber_unter)
+     if (absolute_chronology$break_req == TRUE)
+    {
+      print(absolute_chronology$conflict)
+      return(absolute_chronology)
+    }
+  }
   # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
   # --- --- --- --- --- Ausgabe der Daten --- --- --- --- --- --- ----
 
   # --- --- --- --- --- --- --- --- --- --- --- ---
 
-  stratigraphy <- list(tab_under_above = matrix_ueber_unter, tab_equal = matrix_gleich, absolute_chronology = absolute_chronology)
+
+
+  stratigraphy <- list(tab_under_above = matrix_ueber_unter, tab_equal = matrix_gleich, absolute_chronology = absolute_chronology$tabelle_dat)
+
+  analysis_functions_objects()
+
+  print("Stratification acomplished")
+
   return(stratigraphy)
+
 
 } # End of Function
 
