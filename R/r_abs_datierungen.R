@@ -1,3 +1,6 @@
+# Hallo, hallo -- git???
+# Hallo
+
 # --- --- --- --- --- FUNKTION absolute_datierungen --- --- --- --- --- --- ----
 
 absolute_datierungen <- function(liste_absolute_datierungen, liste_stellen, matrix_gleich, matrix_ueber_unter) # liste_stellen ist redundant, könnnte noch wegrationalisiert werden
