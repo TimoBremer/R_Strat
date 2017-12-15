@@ -1,7 +1,3 @@
-# was habe ich verändert?
-#................................
-x<- 3
-
 # ich habe die Globalvariablen herausgenommen und konnte bislang keinen Bug feststellen – im Auge behalten!
 # ...konnte insbesondere in der Fehleranalyse zu Bugs führen, wenn matrix_gleich und matrix_ueber_unter nicht mehr
 #...global definiert sind
