@@ -1,0 +1,18 @@
+---
+title: "Adding absolute datings"
+author: "Jonathan Schoenenberg"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+
+
+
+# Input
+Als Input sollte eine csv.-Datein eingelesen werden, die zwei Spalten aufweist. in der ersten Spalte stehen die Befundbezeichnungen als "character", in der zweiten die absoluten Daten als numerische Zahlen.
+
+# Schritt 1
+## Aufbereiten der Daten
+Falls die Daten nicht als "character" bzw. als "numeric" hinzerlegt sind werden diese konvertiert. Anschließend wird überprüft, ob jeder datierte Befund auch im vorherigen Programmteil berücksichtigt wurde.

@@ -1,11 +1,20 @@
 Package: RStrat
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
-Encoding: UTF-8
-LazyData: true
+Title: Stratifying archeological features
+Version: 0.1
+Date: 2017-10-05
+Authors@R: c(person("Timo", "Bremer", role = c("aut", "cre"),
+                    email = "tbremer@uni-bonn.de"),
+             person("Jonathan", "Schoenenberg", role = "aut"))
+Maintainer: Timo Bremer <tbremer@uni-bonn.de>
+Description: Stratifies archaeological features by their relative 
+    location. Logical relations between them are deduced from known
+    ones. In addition, unlogical relations are revealed and might be 
+    erased automatically. If absolute datings are known, they are 
+    correlated with all other features.
+License: GPL-3
+LazyData: TRUE
+RoxygenNote: 6.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
